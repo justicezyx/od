@@ -3,4 +3,3 @@ Pillow==9.3.0
 torch==2.0.1
 timm==1.0.3
 Flask==3.0.3
-
