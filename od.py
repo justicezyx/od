@@ -2,10 +2,10 @@ import json
 import requests
 import time
 
-from flask import Flask, jsonify, request
-from transformers import pipeline
 from PIL import Image, ImageDraw, ImageFont
+from flask import Flask, jsonify, request
 from io import BytesIO
+from transformers import pipeline
 
 app = Flask(__name__)
 
