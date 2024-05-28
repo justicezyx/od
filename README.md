@@ -14,6 +14,7 @@ the request, the server:
 
 To run the server, and test it with `curl`:
 ```
+pip3 install -r requirements.txt
 python3 od.py
 curl -X POST http://127.0.0.1:5000/api/v1/users \
     -H "Content-Type: application/json" \
@@ -24,6 +25,9 @@ To run the unit tests:
 ```
 python3 -m unittest od_test.py
 ```
+
+NOTE: I have python3, and do not use python alias, you may need to change to use
+`python`.
 
 ## TODO
 
