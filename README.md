@@ -14,8 +14,21 @@ the request, the server:
 
 To run the server, and test it with `curl`:
 ```
-python od.py
+python3 od.py
 curl -X POST http://127.0.0.1:5000/api/v1/users \
     -H "Content-Type: application/json" \
     -d '{"query": {"object":"person"}}'
 ```
+
+To run the unit tests:
+```
+python3 -m unittest od_test.py
+```
+
+## TODO
+
+1. Enable streaming: for each stackoverflow users user, once finished streaming
+   back the results to client.
+2. Enable specifying arbitrary number of users. Client can specify to fetch `n`
+   users. And server needs to use pagination when fetching user profiles,
+   in order to ensure smooth processing.
