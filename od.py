@@ -10,7 +10,7 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Initialize the object detection pipeline
-object_detector = pipeline("object-detection")
+object_detector = pipeline("object-detection", "facebook/detr-resnet-50")
 
 def not_whitespace_string(input_string):
     if isinstance(input_string, str):
@@ -24,7 +24,6 @@ def fetch_profile_image(profile_image):
     response = requests.get(profile_image)
     if response.status_code == 200:
         image = Image.open(BytesIO(response.content))
-        image.show()
         return image
     else:
         return None
@@ -72,7 +71,6 @@ def detect_object(image, obj_name):
 @app.route('/api/v1/users', methods=['POST'])
 def detections():
     data = request.get_json()
-    print(data)
 
     if 'query' not in data:
         return jsonify({'error': "Query parameter 'query' is required"}), 400
@@ -97,27 +95,33 @@ def detections():
         return jsonify({"error": e.message}), 500
 
     detection_results = []
+
     for user in users:
+        res = {
+            "user_id": user['user_id'],
+            "display_name": user['display_name'],
+            "profile_image": user['profile_image'],
+            "object_detected": False,
+            "bounding_boxes": [],
+            "detection_time_ms": 0,
+        }
+        detection_results.append(res)
+
+        profile_image_url = user['profile_image']
+        if profile_image_url is None or profile_image_url.strip() == '':
+            continue
         profile_image = fetch_profile_image(user['profile_image'])
 
-        user_id = user['user_id']
-        display_name = user['display_name']
-        profile_image = user['profile_image']
-
-        start_time = time.time()  # Record the start time
+        start_time = time.time()
         if profile_image is not None:
             detection_boxes = detect_object(profile_image, query["object"])
-        end_time = time.time()  # Record the end time
+        end_time = time.time()
+
         latency = (end_time - start_time) * 1000
 
-        detection_results.append({
-            "user_id": user_id,
-            "display_name": display_name,
-            "profile_image": profile_image,
-            "object_detected": len(detection_boxes) > 0,
-            "bounding_boxes": detection_boxes,
-            "detection_time_ms": latency,
-        })
+        res['object_detected'] = len(detection_boxes) > 0
+        res['bounding_boxes'] = detection_boxes
+        res['detection_time_ms'] = latency
 
     return jsonify(detection_results), 201
 
