@@ -68,6 +68,48 @@ def detect_object(image, obj_name):
             obj_boxes.append(box)
     return obj_boxes
 
+def process_user(user, obj_name):
+    """
+    Process a user's profile
+
+    Fetch the user's profile image, and use object detection model to detect
+    objects in the image, and find any object whose label is the same as
+    obj_name.
+
+    Parameters:
+    user: A dict, has details about the user's profile.
+    obj_name: A string, the name of a object, eg.: `person` `dog` etc.
+    """
+    res = {
+        "user_id": user['user_id'],
+        "display_name": user['display_name'],
+        "profile_image": user['profile_image'],
+        "object_detected": False,
+        "bounding_boxes": [],
+        "detection_time_ms": 0,
+    }
+
+    profile_image_url = user['profile_image']
+    if profile_image_url is None or profile_image_url.strip() == '':
+        return res
+
+    profile_image = fetch_profile_image(user['profile_image'])
+
+    start_time = time.time()
+    if profile_image is not None:
+        detection_boxes = detect_object(profile_image, obj_name)
+    else:
+        detection_boxes = []
+    end_time = time.time()
+
+    latency = (end_time - start_time) * 1000
+
+    res['object_detected'] = len(detection_boxes) > 0
+    res['bounding_boxes'] = detection_boxes
+    res['detection_time_ms'] = latency
+
+    return res
+
 @app.route('/api/v1/users', methods=['POST'])
 def detections():
     data = request.get_json()
@@ -97,31 +139,8 @@ def detections():
     detection_results = []
 
     for user in users:
-        res = {
-            "user_id": user['user_id'],
-            "display_name": user['display_name'],
-            "profile_image": user['profile_image'],
-            "object_detected": False,
-            "bounding_boxes": [],
-            "detection_time_ms": 0,
-        }
+        res = process_user(user, object_name)
         detection_results.append(res)
-
-        profile_image_url = user['profile_image']
-        if profile_image_url is None or profile_image_url.strip() == '':
-            continue
-        profile_image = fetch_profile_image(user['profile_image'])
-
-        start_time = time.time()
-        if profile_image is not None:
-            detection_boxes = detect_object(profile_image, query["object"])
-        end_time = time.time()
-
-        latency = (end_time - start_time) * 1000
-
-        res['object_detected'] = len(detection_boxes) > 0
-        res['bounding_boxes'] = detection_boxes
-        res['detection_time_ms'] = latency
 
     return jsonify(detection_results), 201
 
