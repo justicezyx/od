@@ -32,3 +32,8 @@ python3 -m unittest od_test.py
 2. Enable specifying arbitrary number of users. Client can specify to fetch `n`
    users. And server needs to use pagination when fetching user profiles,
    in order to ensure smooth processing.
+
+## Notes
+
+This has been done in the span of one day. The actual working time is about 3
+hours.
