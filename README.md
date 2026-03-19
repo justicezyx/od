@@ -26,6 +26,30 @@ To run the unit tests:
 python3 -m unittest od_test.py
 ```
 
+## BTC earning build agent
+
+This repository now also includes a practical planning agent in `btc_agent.py`.
+It ranks online project ideas that can be monetized in BTC, then generates a
+14-day execution plan.
+
+Example:
+
+```bash
+python3 btc_agent.py \
+  --skills python,flask,marketing,sales \
+  --hours 15 \
+  --budget 200 \
+  --risk medium \
+  --top-n 3 \
+  --json
+```
+
+Run tests for the new agent:
+
+```bash
+python3 -m unittest btc_agent_test.py
+```
+
 NOTE: I have python3, and do not use python alias, you may need to change to use
 `python`.
 
