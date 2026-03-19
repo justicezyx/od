@@ -74,7 +74,7 @@ class BitcoinEarningAgent:
             if price <= 0:
                 return DEFAULT_BTC_PRICE_USD
             return price
-        except (requests.RequestException, ValueError, KeyError, TypeError):
+        except (requests.RequestException, ValueError, KeyError, TypeError, RuntimeError):
             return DEFAULT_BTC_PRICE_USD
 
     def rank_opportunities(
